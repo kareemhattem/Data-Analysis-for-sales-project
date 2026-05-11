@@ -336,44 +336,42 @@ left, center, right = st.columns([2, 5, 2], gap="medium")
 # ══════════════════════════════════════════════════════════════════
 with left:
     # Country leaderboard
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🌍 Revenue Leaderboard</div>', unsafe_allow_html=True)
     if not cdf.empty:
         max_rev = cdf["Revenue"].max()
+        rows_html = ""
         for _, row in cdf.iterrows():
             pct = int(row["Revenue"] / max_rev * 100) if max_rev else 0
             rev_m = f"${row['Revenue']/1e6:.1f}M"
-            st.markdown(f"""
+            rows_html += f"""
             <div class="country-row">
               <span class="country-name">{row['Country']}</span>
               <div class="country-bar-wrap"><div class="country-bar" style="width:{pct}%"></div></div>
               <span class="country-val">{rev_m}</span>
-            </div>""", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+            </div>"""
+        st.markdown(f'<div class="glass-card"><div class="section-title">🌍 Revenue Leaderboard</div>{rows_html}</div>', unsafe_allow_html=True)
 
     # AI Insights
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🤖 AI Market Intelligence</div>', unsafe_allow_html=True)
     if not cdf.empty:
+        insights_html = ""
         for _, row in cdf.head(4).iterrows():
             insight = ai_insights.get(row["Country"], "Market performing within expected parameters.")
-            st.markdown(f"""
+            insights_html += f"""
             <div class="ai-insight">
               <span class="ai-tag">⚡ {row['Country']}</span>
               {insight}
-            </div>""", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+            </div>"""
+        st.markdown(f'<div class="glass-card"><div class="section-title">🤖 AI Market Intelligence</div>{insights_html}</div>', unsafe_allow_html=True)
 
     # Alerts
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🔔 Active Alerts</div>', unsafe_allow_html=True)
     st.markdown("""
-    <div class="alert-box">✅ All 8 markets reporting — data pipeline healthy</div>
-    <div class="alert-box">📈 Revenue target on track for selected period</div>
-    <div class="alert-warn">⚠️ Q4 seasonality spike — inventory alert active</div>
-    <div class="alert-warn">⚠️ FX volatility detected in EUR/USD corridor</div>
+    <div class="glass-card">
+      <div class="section-title">🔔 Active Alerts</div>
+      <div class="alert-box">✅ All 8 markets reporting — data pipeline healthy</div>
+      <div class="alert-box">📈 Revenue target on track for selected period</div>
+      <div class="alert-warn">⚠️ Q4 seasonality spike — inventory alert active</div>
+      <div class="alert-warn">⚠️ FX volatility detected in EUR/USD corridor</div>
+    </div>
     """, unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════
 # CENTER PANEL — World Map
@@ -476,9 +474,6 @@ with center:
 # RIGHT PANEL
 # ══════════════════════════════════════════════════════════════════
 with right:
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">📊 Live Performance</div>', unsafe_allow_html=True)
-
     # Mini bar chart — revenue by country
     if not cdf.empty:
         fig_bar = go.Figure(go.Bar(
@@ -501,12 +496,11 @@ with right:
             yaxis=dict(tickfont=dict(color="#94a3b8", size=9), gridcolor="rgba(56,189,248,0.05)"),
             font=dict(color="#94a3b8"),
         )
+        st.markdown('<div class="glass-card"><div class="section-title">📊 Live Performance</div>', unsafe_allow_html=True)
         st.plotly_chart(fig_bar, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
     # Margin gauge
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🎯 Profit Margin</div>', unsafe_allow_html=True)
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number",
         value=margin_pct,
@@ -529,25 +523,26 @@ with right:
         margin=dict(l=10, r=10, t=10, b=10), height=180,
         font=dict(color="#94a3b8"),
     )
+    st.markdown('<div class="glass-card"><div class="section-title">🎯 Profit Margin</div>', unsafe_allow_html=True)
     st.plotly_chart(fig_gauge, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
     # Top country stats
-    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
-    st.markdown('<div class="section-title">🏆 Top Market</div>', unsafe_allow_html=True)
     if not cdf.empty:
         top = cdf.iloc[0]
         st.markdown(f"""
-        <div style="text-align:center;padding:8px 0">
-          <div style="font-family:Orbitron;font-size:1rem;color:#38bdf8">{top['Country']}</div>
-          <div style="font-size:.7rem;color:#64748b;margin:4px 0">REVENUE LEADER</div>
-          <div style="font-family:Orbitron;font-size:1.3rem;color:#10b981">${top['Revenue']/1e6:.1f}M</div>
-          <div style="font-size:.7rem;color:#94a3b8;margin-top:8px">
-            {top['Orders']:,} orders · {top['Customers']:,} customers<br>
-            Margin: {top['Margin']:.1f}%
+        <div class="glass-card">
+          <div class="section-title">🏆 Top Market</div>
+          <div style="text-align:center;padding:8px 0">
+            <div style="font-family:Orbitron;font-size:1rem;color:#38bdf8">{top['Country']}</div>
+            <div style="font-size:.7rem;color:#64748b;margin:4px 0">REVENUE LEADER</div>
+            <div style="font-family:Orbitron;font-size:1.3rem;color:#10b981">${top['Revenue']/1e6:.1f}M</div>
+            <div style="font-size:.7rem;color:#94a3b8;margin-top:8px">
+              {top['Orders']:,} orders · {top['Customers']:,} customers<br>
+              Margin: {top['Margin']:.1f}%
+            </div>
           </div>
         </div>""", unsafe_allow_html=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
 
